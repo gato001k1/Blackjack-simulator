@@ -234,13 +234,35 @@ class BlackjackApp(tk.Tk):
 
     def stand(self):
         if self.game_active:
-            print("Stand - Plasyer ends turn")
+            print("Stand - Player ends turn")
             self.game_active = False
             self.hit_button.config(state="disabled")
             self.stand_button.config(state="disabled")
             
             self.reveal_dealer_hole_card()
-            # Further dealer logic would trigger here
+            # Start Dealer Logic
+            self.after(800, self.perform_dealer_turn)
+
+    def perform_dealer_turn(self):
+        """
+        Dealer hits until score is 17 or higher.
+        Uses recursion with timer to allow animation between cards.
+        """
+        dealer_val = self.calculate_hand_value(self.dealer_hand)
+        
+        if dealer_val < 17:
+            self.deal_card("dealer")
+            # Continue turn after animation delay
+            self.after(1000, self.perform_dealer_turn)
+        else:
+            self.finalize_game_outcome()
+
+    def finalize_game_outcome(self):
+        player_val = self.calculate_hand_value(self.player_hand)
+        dealer_val = self.calculate_hand_value(self.dealer_hand)
+        
+        print(f"Game Over. Player: {player_val}, Dealer: {dealer_val}")
+        # Logic for win/loss text can be added here later
             
     def reveal_dealer_hole_card(self):
         if self.dealer_hole_card_item and self.dealer_hole_card_front:
